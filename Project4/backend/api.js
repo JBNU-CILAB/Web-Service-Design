@@ -10,8 +10,8 @@ const app = express();
 
 // CORS 설정 (클라이언트와 서버가 다른 도메인일 때 필요한 설정)
 const corsOptions = {
-  origin: "http://localhost:5173", // 클라이언트의 도메인 설정
-  // origin: 'https://shimmering-melba-be18b9.netlify.app', // 배포주소
+  origin: "http://localhost:5173",
+  //origin: "http://113.198.66.75:10185", // JCloud 배포 주소
   credentials: true, // 인증 정보를 쿠키에 담아 보내는 것을 허용
 };
 
@@ -90,8 +90,8 @@ router.post("/login", async (req, res) => {
   // 클라이언트에 리프레시 토큰을 쿠키로 전달 (httpOnly 설정으로 JavaScript에서 접근 불가)
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
-    secure: true, // 프로덕션 환경에서는 secure 옵션을 true로 설정
-    sameSite: "None",
+    secure: false, // 프로덕션 환경에서는 secure 옵션을 true로 설정
+    sameSite: "Lax",
   });
 
   // 액세스 토큰을 JSON 응답으로 전달
@@ -113,7 +113,11 @@ router.post("/logout", (req, res) => {
   if (user) user.refreshToken = null; // 리프레시 토큰 무효화
 
   // 클라이언트에 저장된 리프레시 토큰 쿠키 삭제
-  res.clearCookie("refreshToken");
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: false, // 프로덕션 환경에서는 secure 옵션을 true로 설정
+    sameSite: "Lax",
+  });
   res.status(200).json("로그아웃이 정상적으로 처리되었습니다.");
 });
 
